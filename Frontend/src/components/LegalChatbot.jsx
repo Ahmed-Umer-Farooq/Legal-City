@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { MessageCircle, Send, Bot, User } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || '';
+
 const LegalChatbot = () => {
   const [messages, setMessages] = useState([
     {
@@ -38,7 +40,7 @@ const LegalChatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/ai/chatbot', {
+      const response = await fetch(`${API_URL}/ai/chatbot`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
