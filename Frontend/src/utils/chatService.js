@@ -31,7 +31,7 @@ class ChatService {
 
   async getConversations() {
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/chat/conversations', {
+    const response = await fetch(`${API_BASE_URL}/chat/conversations`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return response.json();
@@ -39,7 +39,7 @@ class ChatService {
 
   async getMessages(partnerId, partnerType) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`/api/chat/messages/${partnerId}/${partnerType}`, {
+    const response = await fetch(`${API_BASE_URL}/chat/messages/${partnerId}/${partnerType}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return response.json();
@@ -47,7 +47,7 @@ class ChatService {
 
   async getUnreadCount() {
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/chat/unread-count', {
+    const response = await fetch(`${API_BASE_URL}/chat/unread-count`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return response.json();
@@ -55,7 +55,7 @@ class ChatService {
 
   async markAsRead(partnerId, partnerType) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`/api/chat/messages/read/${partnerId}/${partnerType}`, {
+    const response = await fetch(`${API_BASE_URL}/chat/messages/read/${partnerId}/${partnerType}`, {
       method: 'PUT',
       headers: { 'Authorization': `Bearer ${token}` }
     });
