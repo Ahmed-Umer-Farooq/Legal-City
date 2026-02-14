@@ -1,71 +1,7 @@
 // Centralized restriction checker for lawyer dashboard
+// DEMO MODE: All restrictions disabled for client preview
 export const checkFeatureAccess = (featureName, lawyer) => {
-  if (!lawyer) {
-    return { allowed: false, reason: 'profile_loading' };
-  }
-
-  // Check verification status
-  const isVerified = lawyer.verification_status === 'approved' || 
-                    lawyer.is_verified === true || 
-                    lawyer.verified === true;
-
-  // Normalize feature name to check both formats (dash and underscore)
-  const normalizedFeatureName = featureName.replace(/-/g, '_');
-  const dashFeatureName = featureName.replace(/_/g, '-');
-
-  // 1. Plan restrictions (PRO badge) - Only restriction system
-  const planRestrictions = lawyer.plan_restrictions ? 
-    (typeof lawyer.plan_restrictions === 'string' ? 
-      JSON.parse(lawyer.plan_restrictions) : 
-      lawyer.plan_restrictions) : 
-    {};
-
-  // Check if plan restrictions exist for this feature
-  const hasPlanRestriction = planRestrictions.hasOwnProperty(featureName) || 
-                           planRestrictions.hasOwnProperty(normalizedFeatureName) || 
-                           planRestrictions.hasOwnProperty(dashFeatureName);
-
-  // If plan restrictions exist, use them
-  if (hasPlanRestriction) {
-    const isAllowed = planRestrictions[featureName] === true || 
-                     planRestrictions[normalizedFeatureName] === true || 
-                     planRestrictions[dashFeatureName] === true;
-    
-    if (!isAllowed) {
-      return { allowed: false, reason: 'subscription_required', requiredTier: 'professional' };
-    }
-    // If plan allows it, still check verification for certain features
-    const verificationRequiredFeatures = [
-      'messages', 'contacts', 'calendar', 'payment-records', 'payment_records',
-      'tasks', 'documents', 'clients', 'cases', 'qa', 'qa_answers', 'payouts',
-      'payment-links', 'payment_links', 'reports', 'quick_actions', 'quick-actions'
-    ];
-    
-    if ((verificationRequiredFeatures.includes(featureName) || 
-         verificationRequiredFeatures.includes(normalizedFeatureName) || 
-         verificationRequiredFeatures.includes(dashFeatureName)) && !isVerified) {
-      return { allowed: false, reason: 'verification_required' };
-    }
-    
-    return { allowed: true };
-  }
-
-  // 2. Verification requirements (orange lock) - ALL features require verification
-  const verificationRequiredFeatures = [
-    'messages', 'contacts', 'calendar', 'payment-records', 'payment_records',
-    'tasks', 'documents', 'clients', 'cases', 'qa', 'qa_answers', 'payouts',
-    'payment-links', 'payment_links', 'reports', 'quick_actions', 'quick-actions',
-    'blogs', 'forms', 'ai_analyzer', 'ai-analyzer'
-  ];
-  
-  if (verificationRequiredFeatures.includes(featureName) || 
-      verificationRequiredFeatures.includes(normalizedFeatureName) || 
-      verificationRequiredFeatures.includes(dashFeatureName)) {
-    if (!isVerified) {
-      return { allowed: false, reason: 'verification_required' };
-    }
-  }
-
+  // Allow all features for demo
   return { allowed: true };
 };
 
