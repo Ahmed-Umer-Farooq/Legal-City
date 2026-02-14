@@ -17,8 +17,8 @@ class OAuthController {
 
       const { url, state } = oauthConfig.getAuthURL(role);
       
-      // Store state in secure session
-      req.session.oauthState = state.split(':')[0];
+      // Store state in secure session (just the state token, not the role)
+      req.session.oauthState = state;
       req.session.oauthRole = role;
       
       auditLog('oauth_initiated', {
@@ -39,6 +39,14 @@ class OAuthController {
     try {
       const { code, state, error } = req.query;
 
+      console.log('OAuth callback received:', { 
+        hasCode: !!code, 
+        hasState: !!state, 
+        error,
+        sessionState: req.session.oauthState,
+        sessionRole: req.session.oauthRole
+      });
+
       if (error) {
         auditLog('oauth_error', { error, ip: req.ip });
         return res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_denied`);
@@ -50,8 +58,17 @@ class OAuthController {
 
       // Validate state for CSRF protection
       const [receivedState, role] = state.split(':');
-      if (!oauthConfig.validateState(req.session.oauthState, receivedState)) {
-        auditLog('oauth_csrf_attempt', { ip: req.ip, receivedState });
+      const sessionState = req.session.oauthState;
+      
+      console.log('State validation:', { receivedState, sessionState, role });
+      
+      if (!sessionState || receivedState !== sessionState) {
+        auditLog('oauth_csrf_attempt', { 
+          ip: req.ip, 
+          receivedState, 
+          sessionState,
+          hasSession: !!req.session.oauthState 
+        });
         return res.redirect(`${process.env.FRONTEND_URL}/login?error=invalid_state`);
       }
 
