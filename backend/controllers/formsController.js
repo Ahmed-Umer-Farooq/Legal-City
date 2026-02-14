@@ -126,6 +126,10 @@ const createForm = async (req, res) => {
 // Lawyer: Get own forms
 const getMyForms = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
@@ -152,7 +156,7 @@ const getMyForms = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching my forms:', error);
-    res.status(500).json({ error: 'Failed to fetch forms' });
+    res.status(500).json({ error: 'Failed to fetch forms', details: error.message });
   }
 };
 
