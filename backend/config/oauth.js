@@ -15,10 +15,13 @@ class OAuthConfig {
   }
 
   getGoogleConfig() {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5001';
+    console.log('🔧 OAuth Config - BACKEND_URL:', process.env.BACKEND_URL);
+    console.log('🔧 OAuth Config - Using redirectURI:', `${backendUrl}/api/oauth/google/callback`);
     return {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      redirectURI: `http://localhost:5001/api/oauth/google/callback`,
+      redirectURI: `${backendUrl}/api/oauth/google/callback`,
       scope: ['profile', 'email']
     };
   }
