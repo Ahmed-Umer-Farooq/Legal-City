@@ -39,17 +39,17 @@ const upload = multer({
   }
 });
 
-// Middleware to check if user is a lawyer - DEPLOYMENT VERSION
+// Middleware to check if user is a lawyer - NO MEMBERSHIP RESTRICTIONS
 const requireLawyer = (req, res, next) => {
-  if (req.user && (req.user.role === 'lawyer' || req.user.role === 'premium_lawyer')) {
-    console.log('✅ Lawyer access granted for deployment');
+  if (req.user && req.user.role === 'lawyer') {
+    console.log('✅ Lawyer access granted - no membership restrictions');
     next();
   } else {
     res.status(403).json({ error: 'Access denied. Lawyer account required.' });
   }
 };
 
-// Routes for lawyers only - NO RESTRICTIONS FOR DEPLOYMENT
+// Routes for lawyers only - NO MEMBERSHIP RESTRICTIONS
 router.post('/summarize-document', authenticate, requireLawyer, upload.single('document'), aiController.summarizeDocument);
 router.post('/analyze-contract', authenticate, requireLawyer, aiController.analyzeContract);
 router.post('/document-chat', authenticate, requireLawyer, aiController.documentChat);

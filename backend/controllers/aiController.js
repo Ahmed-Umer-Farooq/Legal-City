@@ -40,7 +40,7 @@ const aiController = {
         const tableExists = await knex.schema.hasTable('ai_document_sessions');
         if (tableExists) {
           const [id] = await knex('ai_document_sessions').insert({
-            lawyer_id: req.user.id,
+            lawyer_id: req.user.id, // Works for any authenticated user
             document_name: req.file.originalname,
             document_content: documentContent.substring(0, 50000), // Limit size
             document_type: fileType,
@@ -163,7 +163,7 @@ Provide a direct, specific answer about the document.`;
 
       // New database-backed format
       const session = await knex('ai_document_sessions')
-        .where({ id: sessionId, lawyer_id: req.user.id })
+        .where({ id: sessionId, lawyer_id: req.user.id }) // Works for any authenticated user
         .first();
         
       if (!session) {
