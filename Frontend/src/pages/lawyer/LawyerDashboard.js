@@ -322,7 +322,7 @@ export default function LawyerDashboard() {
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
-                    <span className="hidden 2xl:block text-xs">{item.label}</span>
+                    <span className="hidden xl:block text-xs">{item.label}</span>
                     {isAdminLocked && (
                       <Lock className="w-2.5 h-2.5 text-red-500" />
                     )}
