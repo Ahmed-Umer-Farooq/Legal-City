@@ -196,7 +196,7 @@ export default function LawyerProfile() {
     if (!user) {
       // Store lawyer info for after login
       const chatData = {
-        partner_id: id, // Use route param (secure_id)
+        partner_id: lawyer.id, // Use numeric ID for backend
         partner_type: 'lawyer',
         partner_name: lawyer.name
       };
@@ -210,7 +210,7 @@ export default function LawyerProfile() {
     
     // Set up chat and navigate
     const chatData = {
-      partner_id: id, // Use route param (secure_id)
+      partner_id: lawyer.id, // Use numeric ID for backend
       partner_type: 'lawyer',
       partner_name: lawyer.name
     };
