@@ -107,6 +107,12 @@ router.put('/', authorize('manage', 'profile'), upload.single('profile_image'), 
       updateData.profile_image = `/uploads/profiles/${req.file.filename}`;
     }
     
+    // Format date_of_birth if present
+    if (updateData.date_of_birth) {
+      const date = new Date(updateData.date_of_birth);
+      updateData.date_of_birth = date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
+    }
+    
     // Remove sensitive fields
     delete updateData.id;
     delete updateData.password;
