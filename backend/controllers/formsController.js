@@ -36,7 +36,18 @@ const getForms = async (req, res) => {
       });
     }
 
-    const total = await query.clone().count('legal_forms.id as count').first();
+    // Separate count query without join to avoid GROUP BY issues
+    let countQuery = db('legal_forms').where('status', 'approved');
+    if (category) countQuery = countQuery.where('category_id', category);
+    if (practice_area) countQuery = countQuery.where('practice_area', practice_area);
+    if (is_free !== undefined) countQuery = countQuery.where('is_free', is_free === 'true');
+    if (search) {
+      countQuery = countQuery.where(function() {
+        this.where('title', 'like', `%${search}%`)
+            .orWhere('description', 'like', `%${search}%`);
+      });
+    }
+    const total = await countQuery.count('id as count').first();
     const forms = await query.orderBy('legal_forms.created_at', 'desc').limit(limit).offset(offset);
 
     res.json({
@@ -123,7 +134,11 @@ const getMyForms = async (req, res) => {
       .select('legal_forms.*', 'form_categories.name as category_name')
       .where('legal_forms.created_by', req.user.id);
 
-    const total = await query.clone().count('legal_forms.id as count').first();
+    // Separate count query
+    const total = await db('legal_forms')
+      .where('created_by', req.user.id)
+      .count('id as count')
+      .first();
     const forms = await query.orderBy('legal_forms.created_at', 'desc').limit(limit).offset(offset);
     
     res.json({
@@ -214,7 +229,10 @@ const getAllForms = async (req, res) => {
 
     if (status) query = query.where('legal_forms.status', status);
 
-    const total = await query.clone().count('legal_forms.id as count').first();
+    // Separate count query
+    let countQuery = db('legal_forms');
+    if (status) countQuery = countQuery.where('status', status);
+    const total = await countQuery.count('id as count').first();
     const forms = await query.orderBy('legal_forms.created_at', 'desc').limit(limit).offset(offset);
 
     res.json({
