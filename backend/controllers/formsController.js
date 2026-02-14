@@ -179,7 +179,9 @@ const getMyForms = async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
+    console.log('✅ DEPLOYMENT MODE: Allowing access to forms');
     console.log('Getting forms for lawyer ID:', req.user.id);
+    
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
@@ -190,7 +192,7 @@ const getMyForms = async (req, res) => {
     ]);
 
     if (!tablesExist[0]) {
-      console.log('legal_forms table missing, returning empty');
+      console.log('⚠️ legal_forms table missing, returning empty');
       return res.json({
         forms: [],
         pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
@@ -203,7 +205,7 @@ const getMyForms = async (req, res) => {
       .count('id as count')
       .first()
       .catch(err => {
-        console.error('Count query error:', err);
+        console.error('❌ Count query error:', err);
         return { count: 0 };
       });
 
@@ -223,11 +225,13 @@ const getMyForms = async (req, res) => {
     }
 
     const forms = await formsQuery.catch(err => {
-      console.error('Forms query error:', err);
+      console.error('❌ Forms query error:', err);
       return [];
     });
     
-    res.json({
+    console.log(`✅ Found ${forms.length} forms for lawyer ${req.user.id}`);
+    
+    return res.json({
       forms,
       pagination: {
         page: parseInt(page),
@@ -237,8 +241,8 @@ const getMyForms = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching my forms:', error);
-    res.json({
+    console.error('❌ Error fetching my forms:', error);
+    return res.status(200).json({
       forms: [],
       pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
       error: 'Unable to fetch forms'
