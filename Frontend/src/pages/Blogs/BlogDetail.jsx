@@ -3,13 +3,12 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, Share2, Heart, Bookmark, Twitter, Facebook, Linkedin, Flag } from 'lucide-react';
 import CommentSection from '../../components/CommentSection';
 import ReportBlogModal from '../../components/modals/ReportBlogModal';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
-
 import { useAuth } from '../../context/AuthContext';
 import { showToast } from '../../utils/toastUtils';
 import { updatePageMeta, generateSlug } from '../../utils/seo';
 import { responsive } from '../../utils/responsive';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 const BlogDetail = () => {
   const { id } = useParams();
