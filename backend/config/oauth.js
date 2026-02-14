@@ -15,13 +15,20 @@ class OAuthConfig {
   }
 
   getGoogleConfig() {
+    // Use BACKEND_URL from env, fallback to localhost for development
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:5001';
-    console.log('🔧 OAuth Config - BACKEND_URL:', process.env.BACKEND_URL);
-    console.log('🔧 OAuth Config - Using redirectURI:', `${backendUrl}/api/oauth/google/callback`);
+    const redirectURI = `${backendUrl}/api/oauth/google/callback`;
+    
+    console.log('🔧 OAuth Config:');
+    console.log('   - BACKEND_URL:', process.env.BACKEND_URL);
+    console.log('   - Resolved backendUrl:', backendUrl);
+    console.log('   - redirectURI:', redirectURI);
+    console.log('   - NODE_ENV:', process.env.NODE_ENV);
+    
     return {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      redirectURI: `${backendUrl}/api/oauth/google/callback`,
+      redirectURI,
       scope: ['profile', 'email']
     };
   }

@@ -69,7 +69,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax', // Changed from 'strict' to 'lax' for OAuth
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
@@ -78,6 +78,12 @@ app.use(session({
   },
   name: 'sessionId', // Don't use default session name
 }));
+
+console.log('🍪 Session configuration:', {
+  sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : 'localhost'
+});
 
 // CSRF token endpoint
 app.get('/api/csrf-token', (req, res) => {

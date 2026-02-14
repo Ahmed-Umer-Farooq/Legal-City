@@ -39,20 +39,31 @@ class OAuthController {
     try {
       const { code, state, error } = req.query;
 
-      console.log('OAuth callback received:', { 
-        hasCode: !!code, 
-        hasState: !!state, 
-        error,
-        sessionState: req.session.oauthState,
-        sessionRole: req.session.oauthRole
+      console.log('=== OAuth Callback Debug ===');
+      console.log('Query params:', { hasCode: !!code, hasState: !!state, error });
+      console.log('Session data:', { 
+        oauthState: req.session.oauthState, 
+        oauthRole: req.session.oauthRole,
+        sessionID: req.sessionID 
+      });
+      console.log('Request info:', {
+        url: req.url,
+        method: req.method,
+        headers: {
+          host: req.get('host'),
+          origin: req.get('origin'),
+          referer: req.get('referer')
+        }
       });
 
       if (error) {
+        console.error('OAuth error from Google:', error);
         auditLog('oauth_error', { error, ip: req.ip });
         return res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_denied`);
       }
 
       if (!code || !state) {
+        console.error('Missing code or state:', { hasCode: !!code, hasState: !!state });
         return res.redirect(`${process.env.FRONTEND_URL}/login?error=missing_params`);
       }
 
@@ -60,9 +71,15 @@ class OAuthController {
       const [receivedState, role] = state.split(':');
       const sessionState = req.session.oauthState;
       
-      console.log('State validation:', { receivedState, sessionState, role });
+      console.log('State validation:', { 
+        receivedState, 
+        sessionState, 
+        role,
+        match: receivedState === sessionState 
+      });
       
       if (!sessionState || receivedState !== sessionState) {
+        console.error('State mismatch - possible CSRF attack or session issue');
         auditLog('oauth_csrf_attempt', { 
           ip: req.ip, 
           receivedState, 
@@ -72,14 +89,19 @@ class OAuthController {
         return res.redirect(`${process.env.FRONTEND_URL}/login?error=invalid_state`);
       }
 
+      console.log('Exchanging code for profile...');
       // Exchange code for tokens
       const profile = await this.exchangeCodeForProfile(code);
       if (!profile || !profile.email) {
+        console.error('Failed to get profile or email');
         return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_profile`);
       }
+      console.log('Profile received:', { email: profile.email, name: profile.name });
 
       // Create or get user
+      console.log('Creating or getting user...');
       const { user, isNewUser } = await this.createOrGetUser(profile, role);
+      console.log('User ready:', { id: user.id, email: user.email, isNewUser });
       
       // Generate secure token
       const token = generateToken({
@@ -110,9 +132,14 @@ class OAuthController {
 
       // Redirect to appropriate dashboard
       const dashboardPath = user.role === 'lawyer' ? '/lawyer-dashboard' : '/user-dashboard';
-      res.redirect(`${process.env.FRONTEND_URL}${dashboardPath}?welcome=${isNewUser ? 'true' : 'false'}`);
+      const redirectUrl = `${process.env.FRONTEND_URL}${dashboardPath}?welcome=${isNewUser ? 'true' : 'false'}`;
+      console.log('Redirecting to:', redirectUrl);
+      res.redirect(redirectUrl);
 
     } catch (error) {
+      console.error('=== OAuth Callback Error ===');
+      console.error('Error:', error);
+      console.error('Stack:', error.stack);
       logger.error('OAuth callback error:', error);
       auditLog('oauth_callback_error', { error: error.message, ip: req.ip });
       res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed`);
