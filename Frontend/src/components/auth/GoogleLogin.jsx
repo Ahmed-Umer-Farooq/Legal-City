@@ -6,21 +6,29 @@ const GoogleLogin = ({ role = 'user', className = '', children }) => {
   const handleGoogleLogin = () => {
     setIsLoading(true);
     
-    // Get backend URL from environment or construct from current location
+    // Get backend URL - prioritize environment variables
     let backendUrl;
-    if (process.env.REACT_APP_API_URL) {
-      // Remove /api suffix if present
-      backendUrl = process.env.REACT_APP_API_URL.replace('/api', '');
-    } else if (process.env.REACT_APP_BACKEND_URL) {
+    
+    // Check for explicit backend URL env vars
+    if (process.env.REACT_APP_BACKEND_URL) {
       backendUrl = process.env.REACT_APP_BACKEND_URL;
+    } else if (process.env.REACT_APP_API_URL) {
+      backendUrl = process.env.REACT_APP_API_URL.replace('/api', '');
     } else {
-      // Fallback: use current origin for production, localhost for development
-      backendUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5001'
-        : window.location.origin;
+      // Fallback logic
+      if (window.location.hostname === 'localhost') {
+        backendUrl = 'http://localhost:5001';
+      } else {
+        // In production without env vars, assume backend is on same domain
+        backendUrl = window.location.origin;
+      }
     }
     
-    console.log('🔗 Redirecting to OAuth:', `${backendUrl}/api/oauth/google?role=${role}`);
+    console.log('🔗 OAuth Redirect:', `${backendUrl}/api/oauth/google?role=${role}`);
+    console.log('📍 Current location:', window.location.origin);
+    console.log('🔧 REACT_APP_BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
+    console.log('🔧 REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+    
     window.location.href = `${backendUrl}/api/oauth/google?role=${encodeURIComponent(role)}`;
   };
 
