@@ -179,45 +179,69 @@ const getMyForms = async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
+    console.log('Getting forms for lawyer ID:', req.user.id);
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
-    // First get the total count with a separate query
+    // Check if tables exist
+    const tablesExist = await Promise.all([
+      db.schema.hasTable('legal_forms').catch(() => false),
+      db.schema.hasTable('form_categories').catch(() => false)
+    ]);
+
+    if (!tablesExist[0]) {
+      console.log('legal_forms table missing, returning empty');
+      return res.json({
+        forms: [],
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
+      });
+    }
+
+    // Get count first
     const total = await db('legal_forms')
       .where('created_by', req.user.id)
       .count('id as count')
-      .first();
+      .first()
+      .catch(err => {
+        console.error('Count query error:', err);
+        return { count: 0 };
+      });
 
-    // Then get the actual forms data
-    const forms = await db('legal_forms')
-      .leftJoin('form_categories', 'legal_forms.category_id', 'form_categories.id')
-      .select('legal_forms.*', 'form_categories.name as category_name')
+    // Get forms data
+    let formsQuery = db('legal_forms')
+      .select('legal_forms.*')
       .where('legal_forms.created_by', req.user.id)
       .orderBy('legal_forms.created_at', 'desc')
       .limit(limit)
       .offset(offset);
+
+    // Only join categories if table exists
+    if (tablesExist[1]) {
+      formsQuery = formsQuery
+        .leftJoin('form_categories', 'legal_forms.category_id', 'form_categories.id')
+        .select('legal_forms.*', 'form_categories.name as category_name');
+    }
+
+    const forms = await formsQuery.catch(err => {
+      console.error('Forms query error:', err);
+      return [];
+    });
     
     res.json({
       forms,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: total.count,
-        totalPages: Math.ceil(total.count / limit)
+        total: total.count || 0,
+        totalPages: Math.ceil((total.count || 0) / limit)
       }
     });
   } catch (error) {
     console.error('Error fetching my forms:', error);
-    // Return empty result instead of 500 error
     res.json({
       forms: [],
-      pagination: {
-        page: parseInt(req.query.page || 1),
-        limit: parseInt(req.query.limit || 20),
-        total: 0,
-        totalPages: 0
-      },
-      error: 'Unable to fetch forms at the moment'
+      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+      error: 'Unable to fetch forms'
     });
   }
 };

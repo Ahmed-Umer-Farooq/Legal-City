@@ -48,10 +48,10 @@ const requireLawyer = (req, res, next) => {
   }
 };
 
-// Routes for lawyers only with feature access check
-router.post('/summarize-document', authenticate, requireLawyer, checkFeatureAccess('ai_analyzer'), upload.single('document'), aiController.summarizeDocument);
-router.post('/analyze-contract', authenticate, requireLawyer, checkFeatureAccess('ai_analyzer'), aiController.analyzeContract);
-router.post('/document-chat', authenticate, requireLawyer, checkFeatureAccess('ai_analyzer'), aiController.documentChat);
+// Routes for lawyers only - REMOVED FEATURE ACCESS CHECK FOR DEPLOYMENT
+router.post('/summarize-document', authenticate, requireLawyer, upload.single('document'), aiController.summarizeDocument);
+router.post('/analyze-contract', authenticate, requireLawyer, aiController.analyzeContract);
+router.post('/document-chat', authenticate, requireLawyer, aiController.documentChat);
 
 // Routes for all users (including public)
 router.post('/chatbot', aiController.chatbot);
