@@ -1,21 +1,15 @@
-// Centralized restriction checker for lawyer dashboard
-// DEMO MODE: All restrictions disabled for client preview
+// DEPLOYMENT MODE: ALL RESTRICTIONS BYPASSED
 export const checkFeatureAccess = (featureName, lawyer) => {
-  // Allow all features for demo
-  return { allowed: true };
+  console.log(`🚀 DEPLOYMENT MODE: Allowing access to ${featureName}`);
+  return { 
+    allowed: true,
+    reason: 'deployment_mode',
+    message: 'All features enabled for deployment'
+  };
 };
 
 export const getRestrictionMessage = (reason, requiredTier) => {
-  switch (reason) {
-    case 'profile_loading':
-      return 'Loading your profile...';
-    case 'verification_required':
-      return 'This feature requires account verification. Please verify your account to continue.';
-    case 'subscription_required':
-      return `This feature requires a ${requiredTier === 'premium' ? 'Premium' : 'Professional'} subscription. Upgrade to unlock.`;
-    default:
-      return 'Access denied';
-  }
+  return 'All features are available during deployment.';
 };
 
 // Get all available features for plan restrictions
