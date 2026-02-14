@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
+import { BACKEND_URL, API_BASE_URL } from '../config/api';
 
-const SOCKET_URL = 'http://localhost:5001';
+const SOCKET_URL = BACKEND_URL;
 
 class ChatService {
   constructor() {
@@ -125,7 +126,7 @@ class ChatService {
 
   async deleteConversation(partnerId, partnerType) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5001/api/chat/conversation/${partnerId}/${partnerType}`, {
+    const response = await fetch(`${API_BASE_URL}/chat/conversation/${partnerId}/${partnerType}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
