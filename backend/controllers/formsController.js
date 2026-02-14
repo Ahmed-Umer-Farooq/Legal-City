@@ -317,36 +317,52 @@ const getAllForms = async (req, res) => {
     const { status, page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
 
+    // Check if table exists
+    const tableExists = await db.schema.hasTable('legal_forms').catch(() => false);
+    if (!tableExists) {
+      return res.json({
+        forms: [],
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
+      });
+    }
+
     // First get the total count
     let countQuery = db('legal_forms');
     if (status) countQuery = countQuery.where('status', status);
-    const total = await countQuery.count('id as count').first();
+    const total = await countQuery.count('id as count').first().catch(() => ({ count: 0 }));
 
     // Then get the actual forms data
     let query = db('legal_forms')
-      .leftJoin('form_categories', 'legal_forms.category_id', 'form_categories.id')
-      .select('legal_forms.*', 'form_categories.name as category_name');
+      .select('legal_forms.*');
+
+    // Only join if categories table exists
+    const categoriesExist = await db.schema.hasTable('form_categories').catch(() => false);
+    if (categoriesExist) {
+      query = query
+        .leftJoin('form_categories', 'legal_forms.category_id', 'form_categories.id')
+        .select('legal_forms.*', 'form_categories.name as category_name');
+    }
 
     if (status) query = query.where('legal_forms.status', status);
     
     const forms = await query
       .orderBy('legal_forms.created_at', 'desc')
       .limit(limit)
-      .offset(offset);
+      .offset(offset)
+      .catch(() => []);
 
-    res.json({
+    return res.json({
       forms,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: total.count,
-        totalPages: Math.ceil(total.count / limit)
+        total: total.count || 0,
+        totalPages: Math.ceil((total.count || 0) / limit)
       }
     });
   } catch (error) {
-    console.error('Error fetching all forms:', error);
-    // Return empty result instead of 500 error
-    res.json({
+    console.error('❌ Error fetching all forms:', error);
+    return res.status(200).json({
       forms: [],
       pagination: {
         page: parseInt(req.query.page || 1),

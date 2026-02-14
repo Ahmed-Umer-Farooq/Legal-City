@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../config/api';
 
 const PayoutRequests = () => {
   const [payouts, setPayouts] = useState([]);
@@ -19,8 +20,8 @@ const PayoutRequests = () => {
     try {
       const token = localStorage.getItem('token');
       const url = filter === 'all' 
-        ? 'http://localhost:5001/api/admin/payouts/payout-requests'
-        : `http://localhost:5001/api/admin/payouts/payout-requests?status=${filter}`;
+        ? `${API_BASE_URL}/admin/payouts/payout-requests`
+        : `${API_BASE_URL}/admin/payouts/payout-requests?status=${filter}`;
       
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
@@ -38,7 +39,7 @@ const PayoutRequests = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `http://localhost:5001/api/admin/payouts/payout-requests/${payoutId}/approve`,
+        `${API_BASE_URL}/admin/payouts/payout-requests/${payoutId}/approve`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -52,7 +53,7 @@ const PayoutRequests = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `http://localhost:5001/api/admin/payouts/payout-requests/${selectedPayout.id}/reject`,
+        `${API_BASE_URL}/admin/payouts/payout-requests/${selectedPayout.id}/reject`,
         { reason: rejectReason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
