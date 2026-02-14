@@ -15,7 +15,7 @@ class OAuthController {
         return res.status(400).json({ error: 'Invalid role specified' });
       }
 
-      const { url, state } = oauthConfig.getAuthURL(role);
+      const { url, state } = oauthConfig.getAuthURL(role, req);
       
       // Store state in secure session (just the state token, not the role)
       req.session.oauthState = state;

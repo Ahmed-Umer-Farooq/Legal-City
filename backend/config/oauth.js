@@ -14,13 +14,27 @@ class OAuthConfig {
     }
   }
 
-  getGoogleConfig() {
-    // Use BACKEND_URL from env, fallback to localhost for development
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5001';
+  getGoogleConfig(req = null) {
+    // Try to get BACKEND_URL from env, or construct from request
+    let backendUrl = process.env.BACKEND_URL;
+    
+    if (!backendUrl && req) {
+      // Construct from request if env var not set
+      const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+      const host = req.headers['x-forwarded-host'] || req.headers.host;
+      backendUrl = `${protocol}://${host}`;
+      console.log('⚠️  BACKEND_URL not set, using request host:', backendUrl);
+    }
+    
+    if (!backendUrl) {
+      backendUrl = 'http://localhost:5001';
+      console.log('⚠️  BACKEND_URL not set and no request, using localhost');
+    }
+    
     const redirectURI = `${backendUrl}/api/oauth/google/callback`;
     
     console.log('🔧 OAuth Config:');
-    console.log('   - BACKEND_URL:', process.env.BACKEND_URL);
+    console.log('   - BACKEND_URL env:', process.env.BACKEND_URL);
     console.log('   - Resolved backendUrl:', backendUrl);
     console.log('   - redirectURI:', redirectURI);
     console.log('   - NODE_ENV:', process.env.NODE_ENV);
@@ -41,8 +55,8 @@ class OAuthConfig {
     return sessionState && receivedState && sessionState === receivedState;
   }
 
-  getAuthURL(role = 'user') {
-    const config = this.getGoogleConfig();
+  getAuthURL(role = 'user', req = null) {
+    const config = this.getGoogleConfig(req);
     const state = this.generateState();
     
     const params = new URLSearchParams({
