@@ -1,6 +1,7 @@
 // Centralized API URL configuration
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
-export const BACKEND_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
+const isProduction = window.location.hostname !== 'localhost';
+export const API_BASE_URL = process.env.REACT_APP_API_URL || (isProduction ? 'https://civil-alexine-legalcityofficial-c84af259.koyeb.app/api' : 'http://localhost:5001/api');
+export const BACKEND_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || (isProduction ? 'https://civil-alexine-legalcityofficial-c84af259.koyeb.app' : 'http://localhost:5001');
 export const SOCKET_URL = BACKEND_URL;
 
 // Helper function to get full image URL
