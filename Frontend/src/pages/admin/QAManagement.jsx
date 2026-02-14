@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../../config/api';
 
 const QAManagement = () => {
   const [questions, setQuestions] = useState([]);
@@ -32,7 +33,7 @@ const QAManagement = () => {
       });
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/admin/qa/questions?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/qa/questions?${queryParams}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -57,7 +58,7 @@ const QAManagement = () => {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/admin/qa/stats', {
+      const response = await fetch(`${API_BASE_URL}/admin/qa/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -76,7 +77,7 @@ const QAManagement = () => {
   const handleStatusChange = async (questionId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/admin/qa/questions/${questionId}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/qa/questions/${questionId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -101,7 +102,7 @@ const QAManagement = () => {
   const handleVisibilityToggle = async (questionId, isPublic) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/admin/qa/questions/${questionId}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/qa/questions/${questionId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -132,7 +133,7 @@ const QAManagement = () => {
               toast.dismiss();
               try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:5001/api/admin/qa/questions/${questionId}`, {
+                const response = await fetch(`${API_BASE_URL}/admin/qa/questions/${questionId}`, {
                   method: 'DELETE',
                   headers: {
                     'Authorization': `Bearer ${token}`,
@@ -201,7 +202,7 @@ const QAManagement = () => {
   const fetchQuestionAnswers = async (questionId) => {
     setLoadingAnswers(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/qa/questions/${questionId}`);
+      const response = await fetch(`${API_BASE_URL}/qa/questions/${questionId}`);
       const data = await response.json();
       
       if (response.ok) {

@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FileText, CheckCircle, XCircle, Clock, Eye, Trash2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '../../utils/api';
-
-const API_BASE_URL = 'http://localhost:5001/api';
+import { API_BASE_URL } from '../../config/api';
 
 export default function AdminFormsManagement() {
   const [forms, setForms] = useState([]);
