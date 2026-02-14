@@ -199,8 +199,8 @@ const getMyForms = async (req, res) => {
       });
     }
 
-    // Get count first
-    const total = await db('legal_forms')
+    // Get count SEPARATELY without joins
+    const countResult = await db('legal_forms')
       .where('created_by', req.user.id)
       .count('id as count')
       .first()
@@ -209,7 +209,9 @@ const getMyForms = async (req, res) => {
         return { count: 0 };
       });
 
-    // Get forms data
+    const total = countResult.count || 0;
+
+    // Get forms data with joins
     let formsQuery = db('legal_forms')
       .select('legal_forms.*')
       .where('legal_forms.created_by', req.user.id)
@@ -236,8 +238,8 @@ const getMyForms = async (req, res) => {
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: total.count || 0,
-        totalPages: Math.ceil((total.count || 0) / limit)
+        total: total,
+        totalPages: Math.ceil(total / limit)
       }
     });
   } catch (error) {
@@ -326,12 +328,13 @@ const getAllForms = async (req, res) => {
       });
     }
 
-    // First get the total count
+    // Get count SEPARATELY without joins
     let countQuery = db('legal_forms');
     if (status) countQuery = countQuery.where('status', status);
-    const total = await countQuery.count('id as count').first().catch(() => ({ count: 0 }));
+    const countResult = await countQuery.count('id as count').first().catch(() => ({ count: 0 }));
+    const total = countResult.count || 0;
 
-    // Then get the actual forms data
+    // Get forms data with joins
     let query = db('legal_forms')
       .select('legal_forms.*');
 
@@ -356,8 +359,8 @@ const getAllForms = async (req, res) => {
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: total.count || 0,
-        totalPages: Math.ceil((total.count || 0) / limit)
+        total: total,
+        totalPages: Math.ceil(total / limit)
       }
     });
   } catch (error) {
