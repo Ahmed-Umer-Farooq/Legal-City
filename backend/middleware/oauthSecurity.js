@@ -147,7 +147,12 @@ class OAuthSecurity {
       message: { error: 'Too many OAuth attempts. Please try again later.' },
       standardHeaders: true,
       legacyHeaders: false,
+      skip: (req) => {
+        console.log(`🔒 OAuth rate limit check - Path: ${req.path}, IP: ${req.ip}`);
+        return false; // Don't skip, just log
+      },
       handler: (req, res) => {
+        console.error(`❌ OAuth rate limit exceeded - IP: ${req.ip}`);
         auditLog('oauth_rate_limit', {
           ip: req.ip,
           userAgent: req.get('User-Agent')

@@ -36,6 +36,17 @@ class OAuthController {
 
   // Handle Google OAuth callback
   async handleGoogleCallback(req, res) {
+    // Log immediately when callback is hit
+    console.log('\n========================================');
+    console.log('🔔 OAUTH CALLBACK HIT!');
+    console.log('========================================');
+    console.log('Full URL:', req.url);
+    console.log('Method:', req.method);
+    console.log('Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('Cookies:', req.cookies);
+    console.log('Session:', req.session);
+    console.log('========================================\n');
+    
     try {
       const { code, state, error } = req.query;
 
@@ -80,6 +91,9 @@ class OAuthController {
       
       if (!sessionState || receivedState !== sessionState) {
         console.error('State mismatch - possible CSRF attack or session issue');
+        console.error('Received state:', receivedState);
+        console.error('Session state:', sessionState);
+        console.error('Session object:', JSON.stringify(req.session, null, 2));
         auditLog('oauth_csrf_attempt', { 
           ip: req.ip, 
           receivedState, 
