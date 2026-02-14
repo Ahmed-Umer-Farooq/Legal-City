@@ -3,6 +3,9 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, Share2, Heart, Bookmark, Twitter, Facebook, Linkedin, Flag } from 'lucide-react';
 import CommentSection from '../../components/CommentSection';
 import ReportBlogModal from '../../components/modals/ReportBlogModal';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+
 import { useAuth } from '../../context/AuthContext';
 import { showToast } from '../../utils/toastUtils';
 import { updatePageMeta, generateSlug } from '../../utils/seo';
@@ -21,8 +24,9 @@ const BlogDetail = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath || imagePath.trim() === '' || imagePath === 'null' || imagePath === null) return null;
     if (imagePath.startsWith('http')) return imagePath;
-    if (imagePath.startsWith('/uploads/')) return `http://localhost:5001${imagePath}`;
-    return `http://localhost:5001/uploads/${imagePath}`;
+    const baseUrl = API_URL.replace('/api', '');
+    if (imagePath.startsWith('/uploads/')) return `${baseUrl}${imagePath}`;
+    return `${baseUrl}/uploads/${imagePath}`;
   };
   
   const getPlaceholderImage = (category, blogId) => {
@@ -81,7 +85,7 @@ const BlogDetail = () => {
         const identifier = id.includes('/') ? id.split('/').pop() : id;
         console.log('🔑 Using identifier:', identifier);
         
-        const response = await fetch(`/api/blogs/${identifier}`);
+        const response = await fetch(`${API_URL}/blogs/${identifier}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -144,10 +148,10 @@ const BlogDetail = () => {
     try {
       const token = localStorage.getItem('token');
       const [likeRes, saveRes] = await Promise.all([
-        fetch(`/api/blogs/${blogId}/like-status`, {
+        fetch(`${API_URL}/blogs/${blogId}/like-status`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`/api/blogs/${blogId}/save-status`, {
+        fetch(`${API_URL}/blogs/${blogId}/save-status`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -171,7 +175,7 @@ const BlogDetail = () => {
     const fetchRelatedArticles = async () => {
       try {
         console.log('🔗 Fetching related articles...');
-        const response = await fetch('/api/blogs?limit=6');
+        const response = await fetch(`${API_URL}/blogs?limit=6`);
         const articles = await response.json();
         
         // Filter out current article and take first 3
@@ -229,7 +233,7 @@ const BlogDetail = () => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/blogs/${blogId}/like`, {
+      const response = await fetch(`${API_URL}/blogs/${blogId}/like`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -282,7 +286,7 @@ const BlogDetail = () => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/blogs/${blogId}/save`, {
+      const response = await fetch(`${API_URL}/blogs/${blogId}/save`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
