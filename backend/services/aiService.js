@@ -6,15 +6,27 @@ const fs = require('fs');
 
 class AIService {
   constructor() {
+    console.log('🤖 Initializing AI Service...');
+    console.log('   - GROK_API_KEY:', process.env.GROK_API_KEY ? `${process.env.GROK_API_KEY.substring(0, 10)}...` : 'NOT SET');
+    console.log('   - GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? `${process.env.GEMINI_API_KEY.substring(0, 10)}...` : 'NOT SET');
+    
     // Initialize Grok (primary)
-    this.groq = new Groq({
-      apiKey: process.env.GROK_API_KEY
-    });
+    if (process.env.GROK_API_KEY) {
+      this.groq = new Groq({
+        apiKey: process.env.GROK_API_KEY
+      });
+      console.log('   ✅ Grok initialized');
+    } else {
+      console.warn('   ⚠️  Grok API key not found');
+    }
     
     // Initialize Gemini (fallback)
     if (process.env.GEMINI_API_KEY) {
       this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
       this.geminiModel = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      console.log('   ✅ Gemini initialized');
+    } else {
+      console.warn('   ⚠️  Gemini API key not found');
     }
   }
 
