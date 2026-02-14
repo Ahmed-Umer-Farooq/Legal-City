@@ -49,7 +49,9 @@ const upload = multer({
 // Get all conversations for a user (including pending messages for lawyers)
 router.get('/conversations', authenticate, async (req, res) => {
   try {
+    console.log('📨 GET /conversations called');
     const { id: userId, role } = req.user;
+    console.log(`User ID: ${userId}, Role: ${role}`);
     
     // Determine user type by checking which table the user exists in
     let userType = 'user';

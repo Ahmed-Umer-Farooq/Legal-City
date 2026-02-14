@@ -49,10 +49,10 @@ const requireLawyer = (req, res, next) => {
   }
 };
 
-// Routes for lawyers only - NO MEMBERSHIP RESTRICTIONS
-router.post('/summarize-document', authenticate, requireLawyer, upload.single('document'), aiController.summarizeDocument);
-router.post('/analyze-contract', authenticate, requireLawyer, aiController.analyzeContract);
-router.post('/document-chat', authenticate, requireLawyer, aiController.documentChat);
+// Routes for all authenticated users - NO RESTRICTIONS
+router.post('/summarize-document', authenticate, upload.single('document'), aiController.summarizeDocument);
+router.post('/analyze-contract', authenticate, aiController.analyzeContract);
+router.post('/document-chat', authenticate, aiController.documentChat);
 
 // Routes for all users (including public)
 router.post('/chatbot', aiController.chatbot);
