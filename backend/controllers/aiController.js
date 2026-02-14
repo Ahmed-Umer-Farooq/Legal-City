@@ -34,17 +34,30 @@ const aiController = {
         documentContent = fs.readFileSync(req.file.path, 'utf8');
       }
       
-      // Store session in database
-      const [sessionId] = await knex('ai_document_sessions').insert({
-        lawyer_id: req.user.id,
-        document_name: req.file.originalname,
-        document_content: documentContent.substring(0, 50000), // Limit size
-        document_type: fileType,
-        document_summary: summary
-      });
+      // Store session in database (with error handling)
+      let sessionId = null;
+      try {
+        const tableExists = await knex.schema.hasTable('ai_document_sessions');
+        if (tableExists) {
+          const [id] = await knex('ai_document_sessions').insert({
+            lawyer_id: req.user.id,
+            document_name: req.file.originalname,
+            document_content: documentContent.substring(0, 50000), // Limit size
+            document_type: fileType,
+            document_summary: summary
+          });
+          sessionId = id;
+        }
+      } catch (dbError) {
+        console.warn('Database storage failed, continuing without session:', dbError.message);
+      }
       
       // Clean up uploaded file
-      fs.unlinkSync(req.file.path);
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupError) {
+        console.warn('File cleanup failed:', cleanupError.message);
+      }
       
       res.json({
         success: true,
@@ -55,7 +68,7 @@ const aiController = {
       });
     } catch (error) {
       console.error('Document summarization error:', error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message || 'Document analysis failed' });
     }
   },
 
