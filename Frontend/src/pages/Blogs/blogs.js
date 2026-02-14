@@ -4,6 +4,10 @@ import { Search, ArrowLeft, Flag } from 'lucide-react';
 import CommentCount from '../../components/CommentCount';
 import ReportBlogModal from '../../components/modals/ReportBlogModal';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const BACKEND_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5001/api').replace('/api', '');
+
+
 
 // Blog Card Component
 const BlogCard = ({ secure_id, slug, image, category, title, author, authorImage, date, comment_count = 0, onReport }) => {
@@ -589,7 +593,7 @@ const Blog = () => {
         console.log('🔄 Fetching blogs from:', 'http://localhost:5001/api/blogs');
         
         // Use relative URL due to proxy configuration
-        const response = await fetch('/api/blogs', {
+        const response = await fetch(`${API_URL}/blogs`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -943,3 +947,4 @@ const Blog = () => {
 };
 
 export default Blog;
+
