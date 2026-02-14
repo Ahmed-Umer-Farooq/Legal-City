@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Upload, FileText, Brain, Download, AlertCircle, MessageCircle, Send, Home } from 'lucide-react';
 import jsPDF from 'jspdf';
 
+const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || '';
+
 const DocumentAnalyzer = () => {
   const [file, setFile] = useState(null);
   const [analysis, setAnalysis] = useState(null);
@@ -42,7 +44,7 @@ const DocumentAnalyzer = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/ai/summarize-document', {
+      const response = await fetch(`${API_URL}/ai/summarize-document`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -171,7 +173,7 @@ const DocumentAnalyzer = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/ai/document-chat', {
+      const response = await fetch(`${API_URL}/ai/document-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
