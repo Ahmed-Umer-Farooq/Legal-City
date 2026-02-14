@@ -1045,7 +1045,90 @@ const AdminDashboard = ({ activeTabProp }) => {
         </div>
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Mobile Card Layout */}
+      <div className="block md:hidden">
+        {loading ? (
+          <div className="p-6 text-center text-gray-500">Loading...</div>
+        ) : users.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">No users found</div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {users.map(tableUser => (
+              <div key={tableUser.id} className="p-4 hover:bg-gray-50">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">{tableUser.name || 'Not provided'}</h4>
+                    <p className="text-sm text-gray-500">{tableUser.email}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    tableUser.is_admin || tableUser.role === 'admin'
+                      ? 'bg-purple-100 text-purple-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {tableUser.is_admin || tableUser.role === 'admin' ? 'Admin' : 'User'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                  <div>
+                    <span className="text-gray-500">ID:</span>
+                    <span className="ml-1 text-gray-900">{tableUser.id}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Phone:</span>
+                    <span className="ml-1 text-gray-900">{tableUser.mobile_number || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Status:</span>
+                    <span className={`ml-1 px-2 py-1 text-xs rounded-full ${
+                      tableUser.verified || tableUser.is_verified || tableUser.status === 'verified'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {tableUser.verified || tableUser.is_verified || tableUser.status === 'verified' ? 'Verified' : 'Active'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Joined:</span>
+                    <span className="ml-1 text-gray-900">{new Date(tableUser.created_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {!(tableUser.is_admin || tableUser.role === 'admin') && (
+                    <button
+                      onClick={() => handleMakeAdmin(tableUser.id)}
+                      className="p-2 text-purple-600 hover:text-purple-800 bg-purple-50 rounded-lg"
+                      title="Make Admin"
+                    >
+                      <Shield className="w-4 h-4" />
+                    </button>
+                  )}
+                  {(tableUser.is_admin || tableUser.role === 'admin') && tableUser.id !== user.id && (
+                    <button
+                      onClick={() => handleRemoveAdmin(tableUser.id)}
+                      className="p-2 text-orange-600 hover:text-orange-800 bg-orange-50 rounded-lg"
+                      title="Remove Admin"
+                    >
+                      <ShieldOff className="w-4 h-4" />
+                    </button>
+                  )}
+                  {!(tableUser.is_admin || tableUser.role === 'admin') && (
+                    <button
+                      onClick={() => handleDeleteUser(tableUser.id)}
+                      className="p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-lg"
+                      title="Delete User"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Desktop Table Layout */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full min-w-0">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -1062,7 +1145,7 @@ const AdminDashboard = ({ activeTabProp }) => {
           <tbody className="divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                   Loading...
                 </td>
               </tr>
@@ -1139,8 +1222,8 @@ const AdminDashboard = ({ activeTabProp }) => {
       </div>
 
       {/* Pagination */}
-      <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-        <p className="text-sm text-gray-500">
+      <div className="px-3 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-sm text-gray-500 text-center sm:text-left">
           Showing {((usersPagination.page - 1) * usersPagination.limit) + 1} to{' '}
           {Math.min(usersPagination.page * usersPagination.limit, usersPagination.total)} of{' '}
           {usersPagination.total} users
@@ -1216,7 +1299,78 @@ const AdminDashboard = ({ activeTabProp }) => {
         </div>
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Mobile Card Layout */}
+      <div className="block md:hidden">
+        {loading ? (
+          <div className="p-6 text-center text-gray-500">Loading...</div>
+        ) : lawyers.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">No lawyers found</div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {lawyers.map(lawyer => (
+              <div key={lawyer.id} className="p-4 hover:bg-gray-50">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">{lawyer.name || 'Not provided'}</h4>
+                    <p className="text-sm text-gray-500">{lawyer.email}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    lawyer.lawyer_verified || lawyer.is_verified || lawyer.verified
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {lawyer.lawyer_verified || lawyer.is_verified || lawyer.verified ? 'Verified' : 'Pending'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-2 text-sm mb-3">
+                  <div>
+                    <span className="text-gray-500">ID:</span>
+                    <span className="ml-1 text-gray-900">{lawyer.id}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Registration ID:</span>
+                    <span className="ml-1 text-gray-900">{lawyer.registration_id || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Speciality:</span>
+                    <span className="ml-1 text-gray-900">{lawyer.speciality || 'N/A'}</span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {!(lawyer.lawyer_verified || lawyer.is_verified || lawyer.verified) && (
+                    <button
+                      onClick={() => handleVerifyLawyer(lawyer.id)}
+                      className="p-2 text-green-600 hover:text-green-800 bg-green-50 rounded-lg"
+                      title="Verify Lawyer"
+                    >
+                      <UserCheck className="w-4 h-4" />
+                    </button>
+                  )}
+                  {(lawyer.lawyer_verified || lawyer.is_verified || lawyer.verified) && (
+                    <button
+                      onClick={() => handleRejectLawyer(lawyer.id)}
+                      className="p-2 text-yellow-600 hover:text-yellow-800 bg-yellow-50 rounded-lg"
+                      title="Unverify Lawyer"
+                    >
+                      <UserX className="w-4 h-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteLawyer(lawyer.id)}
+                    className="p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-lg"
+                    title="Delete Lawyer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Desktop Table Layout */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full min-w-0">
           <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
             <tr>
@@ -1296,8 +1450,8 @@ const AdminDashboard = ({ activeTabProp }) => {
       </div>
 
       {/* Pagination */}
-      <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-        <p className="text-sm text-gray-500">
+      <div className="px-3 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-sm text-gray-500 text-center sm:text-left">
           Showing {((lawyersPagination.page - 1) * lawyersPagination.limit) + 1} to{' '}
           {Math.min(lawyersPagination.page * lawyersPagination.limit, lawyersPagination.total)} of{' '}
           {lawyersPagination.total} lawyers
@@ -1373,7 +1527,87 @@ const AdminDashboard = ({ activeTabProp }) => {
         </div>
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Mobile Card Layout */}
+      <div className="block md:hidden">
+        {loading ? (
+          <div className="p-6 text-center text-gray-500">Loading...</div>
+        ) : blogs.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">No blogs found</div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {blogs.map(blog => (
+              <div key={blog.id} className="p-4 hover:bg-gray-50">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900 line-clamp-2">{blog.title}</h4>
+                    <p className="text-sm text-gray-500 mt-1">By {blog.author_name || 'Unknown'}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ml-2 ${
+                    blog.status === 'published'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {blog.status || 'Published'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                  <div>
+                    <span className="text-gray-500">ID:</span>
+                    <span className="ml-1 text-gray-900">{blog.id || blog.secure_id}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Category:</span>
+                    <span className="ml-1 text-gray-900">{blog.category || 'General'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Comments:</span>
+                    <span className="ml-1 text-gray-900 flex items-center gap-1">
+                      <MessageCircle className="w-3 h-3" />
+                      {blog.comment_count || 0}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Created:</span>
+                    <span className="ml-1 text-gray-900">
+                      {blog.created_at ? new Date(blog.created_at).toLocaleDateString() : 
+                       blog.published_at ? new Date(blog.published_at).toLocaleDateString() : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleViewBlogComments(blog)}
+                    className="p-2 text-blue-600 hover:text-blue-800 bg-blue-50 rounded-lg"
+                    title="View Comments"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const slug = blog.slug || blog.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                      navigate(`/admin/legal-blog/${slug}/${blog.secure_id}`);
+                    }}
+                    className="p-2 text-green-600 hover:text-green-800 bg-green-50 rounded-lg"
+                    title="View Blog"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteBlog(blog.id || blog.secure_id)}
+                    className="p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-lg"
+                    title="Delete Blog"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Desktop Table Layout */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full min-w-0">
           <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
             <tr>
@@ -1871,39 +2105,39 @@ const AdminDashboard = ({ activeTabProp }) => {
 
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-5 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3 shadow-md">
-                <Activity className="w-5 h-5 text-white" />
+        <div className="px-3 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shadow-md">
+                <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               Activity Logs ({filteredLogs.length})
             </h3>
             <button
               onClick={fetchActivityLogs}
-              className="px-5 py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all shadow-sm font-medium flex items-center gap-2"
+              className="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all shadow-sm font-medium flex items-center justify-center gap-2 text-sm"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
           
           {/* Search and Filter Controls */}
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search activities by event, user, or details..."
+                placeholder="Search activities..."
                 value={logsSearch}
                 onChange={(e) => setLogsSearch(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               />
             </div>
             <select
               value={logsFilter}
               onChange={(e) => setLogsFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             >
               <option value="all">All Activities</option>
               <option value="user_registration">User Registrations</option>
@@ -1918,29 +2152,29 @@ const AdminDashboard = ({ activeTabProp }) => {
       
         <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
           {loading ? (
-            <div className="px-6 py-8 text-center text-gray-500">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              Loading activity logs...
+            <div className="px-3 sm:px-6 py-6 sm:py-8 text-center text-gray-500">
+              <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              <p className="text-sm">Loading activity logs...</p>
             </div>
           ) : filteredLogs.length === 0 ? (
-            <div className="px-6 py-8 text-center text-gray-500">
-              <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p>{logsSearch || logsFilter !== 'all' ? 'No activities match your search' : 'No recent activity found'}</p>
+            <div className="px-3 sm:px-6 py-6 sm:py-8 text-center text-gray-500">
+              <Activity className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-sm">{logsSearch || logsFilter !== 'all' ? 'No activities match your search' : 'No recent activity found'}</p>
             </div>
           ) : (
             filteredLogs.map(log => (
-              <div key={log.id} className="px-6 py-4 hover:bg-gray-50">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3">
+              <div key={log.id} className="px-3 sm:px-6 py-3 sm:py-4 hover:bg-gray-50">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0">
+                  <div className="flex items-start space-x-3 flex-1">
                     <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
                       log.status === 'success' ? 'bg-green-500' : 
                       log.status === 'pending' ? 'bg-yellow-500' : 
                       log.status === 'error' ? 'bg-red-500' : 'bg-gray-400'
                     }`} />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium text-gray-900">{log.event}</span>
-                        <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                        <span className="text-sm font-medium text-gray-900 truncate">{log.event}</span>
+                        <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 w-fit ${
                           log.type === 'user_registration' ? 'bg-blue-100 text-blue-800' :
                           log.type === 'lawyer_activity' ? 'bg-purple-100 text-purple-800' :
                           log.type === 'chat_activity' ? 'bg-green-100 text-green-800' :
@@ -1953,13 +2187,13 @@ const AdminDashboard = ({ activeTabProp }) => {
                           {log.type?.replace('_', ' ') || 'activity'}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600 mb-1">{log.details}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-sm text-gray-600 mb-1 break-words">{log.details}</div>
+                      <div className="text-xs text-gray-500 truncate">
                         User: {log.user}
                       </div>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-400 ml-4 flex-shrink-0">
+                  <div className="text-xs text-gray-400 flex-shrink-0 self-start sm:ml-4">
                     {log.timestamp}
                   </div>
                 </div>
@@ -1973,45 +2207,45 @@ const AdminDashboard = ({ activeTabProp }) => {
   
   // Call Tracking View
   const renderCallTracking = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-blue-500">
           <div className="flex items-center">
-            <Phone className="w-8 h-8 text-blue-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Calls</p>
-              <p className="text-2xl font-bold text-gray-900">{activeCalls.length}</p>
+            <Phone className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Active Calls</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{activeCalls.length}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-green-500">
           <div className="flex items-center">
-            <TrendingUp className="w-8 h-8 text-green-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Today's Calls</p>
-              <p className="text-2xl font-bold text-gray-900">{callStats.todayCalls}</p>
+            <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Today's Calls</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{callStats.todayCalls}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-purple-500">
           <div className="flex items-center">
-            <Users className="w-8 h-8 text-purple-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Calls</p>
-              <p className="text-2xl font-bold text-gray-900">{callStats.totalCalls}</p>
+            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Total Calls</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{callStats.totalCalls}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-orange-500">
           <div className="flex items-center">
-            <Clock className="w-8 h-8 text-orange-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Avg Duration</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCallDuration(callStats.avgDuration)}</p>
+            <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Avg Duration</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{formatCallDuration(callStats.avgDuration)}</p>
             </div>
           </div>
         </div>
@@ -2019,37 +2253,37 @@ const AdminDashboard = ({ activeTabProp }) => {
 
       {/* Active Calls */}
       <div className="bg-white rounded-lg shadow-md">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-2"></div>
             Active Calls ({activeCalls.length})
           </h3>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {activeCalls.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No active calls</p>
+            <p className="text-gray-500 text-center py-6 sm:py-8 text-sm">No active calls</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {activeCalls.map((call, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                      <Phone className="w-5 h-5 text-white" />
+                <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200 gap-3 sm:gap-0">
+                  <div className="flex items-center space-x-3 sm:space-x-4">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-full flex items-center justify-center">
+                      <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 text-sm sm:text-base">
                         {call.userName} ({call.userType}) ↔ {call.partnerName}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs sm:text-sm text-gray-600">
                         Active voice call
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-green-600">
+                  <div className="text-left sm:text-right">
+                    <p className="font-medium text-green-600 text-sm sm:text-base">
                       {formatCallDuration(getCallDuration(call.callStartTime))}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       Started {new Date(call.callStartTime).toLocaleTimeString()}
                     </p>
                   </div>
@@ -2062,32 +2296,32 @@ const AdminDashboard = ({ activeTabProp }) => {
 
       {/* Recent Calls */}
       <div className="bg-white rounded-lg shadow-md">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800">Recent Calls</h3>
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800">Recent Calls</h3>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {callStats.recentCalls.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No recent calls</p>
+            <p className="text-gray-500 text-center py-6 sm:py-8 text-sm">No recent calls</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {callStats.recentCalls.map((call, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Phone className="w-4 h-4 text-gray-600" />
+                <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-gray-50 rounded-lg gap-2 sm:gap-0">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 text-sm">
                         {call.user_type === 'lawyer' ? '⚖️' : '👤'}
                         {call.partner_name}
-                        <span className="text-xs text-gray-500">({call.user_type} → {call.partner_type})</span>
+                        <span className="text-xs text-gray-500 ml-1">({call.user_type} → {call.partner_type})</span>
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         {new Date(call.created_at).toLocaleDateString()} at {new Date(call.created_at).toLocaleTimeString()}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-900">{formatCallDuration(call.duration)}</p>
-                    <p className="text-sm text-gray-500">{call.call_type}</p>
+                  <div className="text-left sm:text-right">
+                    <p className="font-medium text-gray-900 text-sm">{formatCallDuration(call.duration)}</p>
+                    <p className="text-xs text-gray-500">{call.call_type}</p>
                   </div>
                 </div>
               ))}
@@ -2122,22 +2356,23 @@ const AdminDashboard = ({ activeTabProp }) => {
         {/* Main Content */}
         <main className="overflow-x-hidden">
           {/* Header */}
-          <header className="bg-white shadow-sm border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
+          <header className="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 sticky top-0 z-10">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <button
                   onClick={refreshData}
                   disabled={refreshing}
                   className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all disabled:opacity-50"
                   title="Refresh Data"
                 >
-                  <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${refreshing ? 'animate-spin' : ''}`} />
                 </button>
                 <button
                   onClick={() => navigate('/')}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium"
+                  className="px-3 sm:px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium"
                 >
-                  Home
+                  <span className="hidden sm:inline">Home</span>
+                  <span className="sm:hidden">🏠</span>
                 </button>
               </div>
               <div className="relative" 
@@ -2150,19 +2385,19 @@ const AdminDashboard = ({ activeTabProp }) => {
                   setDropdownTimeout(timeout);
                 }}>
                 <button
-                  className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                  className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md hover:shadow-lg transition-all"
                 >
                   {user?.name?.charAt(0) || 'A'}
                 </button>
                 {showProfileDropdown && (
-                  <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-64 sm:w-72 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                     <div className="px-4 py-3 border-b border-gray-100">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                           {user?.name?.charAt(0) || 'A'}
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-900">{user?.name || 'Admin'}</p>
+                          <p className="text-sm font-semibold text-gray-900 truncate">{user?.name || 'Admin'}</p>
                           <span className="inline-block px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded-full mt-1">
                             {user?.role === 'admin' || user?.is_admin ? 'Administrator' : 'User'}
                           </span>
@@ -2208,7 +2443,7 @@ const AdminDashboard = ({ activeTabProp }) => {
               </div>
             </div>
           </header>
-          <div className="p-8 max-w-[calc(100vw-2rem)] overflow-x-auto">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-[calc(100vw-1rem)] sm:max-w-[calc(100vw-2rem)] overflow-x-auto">
         {activeTab === 'dashboard' && renderDashboard()}
         {activeTab === 'users' && renderUsers()}
         {activeTab === 'lawyers' && renderLawyers()}
@@ -2325,11 +2560,11 @@ const AdminDashboard = ({ activeTabProp }) => {
               {/* Reviews Tab Content */}
               {activeReviewsTab === 'reviews' && (
                 <div>
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900">User Reviews</h3>
-                      <div className="flex items-center space-x-4">
-                        <div className="relative">
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">User Reviews</h3>
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:flex-none">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                           <input
                             type="text"
@@ -2339,21 +2574,66 @@ const AdminDashboard = ({ activeTabProp }) => {
                               setReviewsSearch(e.target.value);
                               setReviewsPagination(prev => ({ ...prev, page: 1 }));
                             }}
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                           />
                         </div>
                         <button
                           onClick={fetchLawyerReviews}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2"
+                          className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 text-sm"
                         >
                           <RefreshCw className="w-4 h-4" />
-                          Refresh
+                          <span className="hidden sm:inline">Refresh</span>
                         </button>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="overflow-x-auto">
+                  {/* Mobile Card Layout */}
+                  <div className="block md:hidden">
+                    {loadingLawyerReviews ? (
+                      <div className="p-6 text-center text-gray-500">Loading reviews...</div>
+                    ) : lawyerReviews.length === 0 ? (
+                      <div className="p-6 text-center text-gray-500">No reviews found</div>
+                    ) : (
+                      <div className="divide-y divide-gray-200">
+                        {lawyerReviews.map(review => (
+                          <div key={review.id} className="p-4 hover:bg-gray-50">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-gray-900">{review.user_name || 'Anonymous'}</h4>
+                                <p className="text-sm text-gray-500">{review.user_email}</p>
+                              </div>
+                              <div className="flex items-center ml-2">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                                ))}
+                                <span className="ml-1 text-sm text-gray-600">({review.rating})</span>
+                              </div>
+                            </div>
+                            <div className="mb-3">
+                              <p className="text-sm text-gray-600 mb-1">For: {review.lawyer_name || 'Unknown'}</p>
+                              <p className="text-sm text-gray-800 line-clamp-3">{review.review_text || 'No review text'}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-500">
+                                {new Date(review.created_at).toLocaleDateString()}
+                              </span>
+                              <button
+                                onClick={() => handleDeleteReview(review.id)}
+                                className="p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-lg"
+                                title="Delete Review"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Desktop Table Layout */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
@@ -2462,11 +2742,11 @@ const AdminDashboard = ({ activeTabProp }) => {
               {/* Endorsements Tab Content */}
               {activeReviewsTab === 'endorsements' && (
                 <div>
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900">Lawyer Endorsements</h3>
-                      <div className="flex items-center space-x-4">
-                        <div className="relative">
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">Lawyer Endorsements</h3>
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:flex-none">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                           <input
                             type="text"
@@ -2476,21 +2756,63 @@ const AdminDashboard = ({ activeTabProp }) => {
                               setEndorsementsSearch(e.target.value);
                               setEndorsementsPagination(prev => ({ ...prev, page: 1 }));
                             }}
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                           />
                         </div>
                         <button
                           onClick={fetchLawyerEndorsements}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all flex items-center gap-2"
+                          className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all flex items-center justify-center gap-2 text-sm"
                         >
                           <RefreshCw className="w-4 h-4" />
-                          Refresh
+                          <span className="hidden sm:inline">Refresh</span>
                         </button>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="overflow-x-auto">
+                  {/* Mobile Card Layout */}
+                  <div className="block md:hidden">
+                    {loadingEndorsements ? (
+                      <div className="p-6 text-center text-gray-500">Loading endorsements...</div>
+                    ) : lawyerEndorsements.length === 0 ? (
+                      <div className="p-6 text-center text-gray-500">No endorsements found</div>
+                    ) : (
+                      <div className="divide-y divide-gray-200">
+                        {lawyerEndorsements.map(endorsement => (
+                          <div key={endorsement.id} className="p-4 hover:bg-gray-50">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-gray-900">{endorsement.endorser_name || 'Unknown'}</h4>
+                                <p className="text-sm text-gray-500">{endorsement.endorser_email}</p>
+                              </div>
+                              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full ml-2">
+                                {endorsement.relationship}
+                              </span>
+                            </div>
+                            <div className="mb-3">
+                              <p className="text-sm text-gray-600 mb-1">Endorsed: {endorsement.endorsed_name || 'Unknown'}</p>
+                              <p className="text-sm text-gray-800 line-clamp-3">{endorsement.endorsement_text}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-500">
+                                {new Date(endorsement.created_at).toLocaleDateString()}
+                              </span>
+                              <button
+                                onClick={() => handleDeleteEndorsement(endorsement.id)}
+                                className="p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-lg"
+                                title="Delete Endorsement"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Desktop Table Layout */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
