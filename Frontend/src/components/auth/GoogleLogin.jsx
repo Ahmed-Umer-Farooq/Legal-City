@@ -6,8 +6,21 @@ const GoogleLogin = ({ role = 'user', className = '', children }) => {
   const handleGoogleLogin = () => {
     setIsLoading(true);
     
-    // Direct redirect to OAuth endpoint
-    const backendUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
+    // Get backend URL from environment or construct from current location
+    let backendUrl;
+    if (process.env.REACT_APP_API_URL) {
+      // Remove /api suffix if present
+      backendUrl = process.env.REACT_APP_API_URL.replace('/api', '');
+    } else if (process.env.REACT_APP_BACKEND_URL) {
+      backendUrl = process.env.REACT_APP_BACKEND_URL;
+    } else {
+      // Fallback: use current origin for production, localhost for development
+      backendUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5001'
+        : window.location.origin;
+    }
+    
+    console.log('🔗 Redirecting to OAuth:', `${backendUrl}/api/oauth/google?role=${role}`);
     window.location.href = `${backendUrl}/api/oauth/google?role=${encodeURIComponent(role)}`;
   };
 
