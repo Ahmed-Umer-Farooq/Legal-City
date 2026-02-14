@@ -620,7 +620,21 @@ const getAllReviews = async (req, res) => {
       });
     }
 
-    const total = await query.clone().count('lawyer_reviews.id as count').first();
+    // Separate count query without joins
+    let countQuery = db('lawyer_reviews');
+    if (search) {
+      countQuery = countQuery
+        .leftJoin('users', 'lawyer_reviews.user_id', 'users.id')
+        .leftJoin('lawyers', 'lawyer_reviews.lawyer_id', 'lawyers.id')
+        .where(function() {
+          this.where('users.name', 'like', `%${search}%`)
+              .orWhere('lawyers.name', 'like', `%${search}%`)
+              .orWhere('lawyer_reviews.review_text', 'like', `%${search}%`);
+        });
+    }
+    const countResult = await countQuery.count('lawyer_reviews.id as count').first();
+    const total = countResult.count || 0;
+
     const reviews = await query
       .orderBy('lawyer_reviews.created_at', 'desc')
       .limit(limit)
@@ -631,8 +645,8 @@ const getAllReviews = async (req, res) => {
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: total.count,
-        totalPages: Math.ceil(total.count / limit)
+        total: total,
+        totalPages: Math.ceil(total / limit)
       }
     });
   } catch (error) {
