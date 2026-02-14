@@ -23,7 +23,7 @@ class AIService {
     // Initialize Gemini (fallback)
     if (process.env.GEMINI_API_KEY) {
       this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      this.geminiModel = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      this.geminiModel = this.genAI.getGenerativeModel({ model: "gemini-pro" });
       console.log('   ✅ Gemini initialized');
     } else {
       console.warn('   ⚠️  Gemini API key not found');
@@ -55,29 +55,20 @@ class AIService {
 Document content:
 ${text.substring(0, 8000)}`;
 
-      // Try Grok first
-      try {
-        if (process.env.GROK_API_KEY) {
-          const completion = await this.groq.chat.completions.create({
-            messages: [{ role: 'user', content: prompt }],
-            model: 'llama-3.1-8b-instant',
-            temperature: 0.3,
-            max_tokens: 1000
-          });
-          return completion.choices[0]?.message?.content || 'Summary unavailable.';
-        }
-      } catch (grokError) {
-        console.log('Grok failed for document summary, trying Gemini:', grokError.message);
-        
-        // Fallback to Gemini
-        if (this.geminiModel) {
-          const result = await this.geminiModel.generateContent(prompt);
-          return result.response.text();
-        }
+      // Use Grok only
+      if (!process.env.GROK_API_KEY) {
+        throw new Error('Grok API key not configured');
       }
       
-      throw new Error('Document analysis temporarily unavailable.');
+      const completion = await this.groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.3,
+        max_tokens: 1000
+      });
+      return completion.choices[0]?.message?.content || 'Summary unavailable.';
     } catch (error) {
+      console.error('Document analysis error:', error.message);
       throw new Error(`Document analysis failed: ${error.message}`);
     }
   }
@@ -94,33 +85,23 @@ Provide a helpful, professional response that:
 - Recommends consulting with a lawyer for specific advice
 - Keeps responses concise and actionable`;
 
-    // Try Grok first (primary)
+    // Use Grok (primary and only)
     try {
-      if (process.env.GROK_API_KEY) {
-        const completion = await this.groq.chat.completions.create({
-          messages: [{ role: 'user', content: prompt }],
-          model: 'llama-3.1-8b-instant',
-          temperature: 0.7,
-          max_tokens: 500
-        });
-        return completion.choices[0]?.message?.content || 'I apologize, but I cannot provide a response at this time.';
+      if (!process.env.GROK_API_KEY) {
+        throw new Error('Grok API key not configured');
       }
-    } catch (grokError) {
-      console.log('Grok API failed, trying Gemini fallback:', grokError.message);
       
-      // Try Gemini as fallback
-      try {
-        if (this.geminiModel) {
-          const result = await this.geminiModel.generateContent(prompt);
-          return result.response.text();
-        }
-      } catch (geminiError) {
-        console.error('Both AI services failed:', { grok: grokError.message, gemini: geminiError.message });
-      }
+      const completion = await this.groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.7,
+        max_tokens: 500
+      });
+      return completion.choices[0]?.message?.content || 'I apologize, but I cannot provide a response at this time.';
+    } catch (error) {
+      console.error('Grok API error:', error.message);
+      throw new Error('AI service temporarily unavailable. Please try again later.');
     }
-    
-    // If both fail, return helpful fallback
-    throw new Error('AI service temporarily unavailable. Please try again or contact support.');
   }
 
   async analyzeContract(text) {
@@ -135,32 +116,23 @@ Provide a helpful, professional response that:
 Contract text:
 ${text.substring(0, 8000)}`;
 
-    // Try Grok first
+    // Use Grok only
     try {
-      if (process.env.GROK_API_KEY) {
-        const completion = await this.groq.chat.completions.create({
-          messages: [{ role: 'user', content: prompt }],
-          model: 'llama-3.1-8b-instant',
-          temperature: 0.3,
-          max_tokens: 800
-        });
-        return completion.choices[0]?.message?.content || 'Analysis unavailable.';
+      if (!process.env.GROK_API_KEY) {
+        throw new Error('Grok API key not configured');
       }
-    } catch (grokError) {
-      console.log('Grok failed for contract analysis, trying Gemini:', grokError.message);
       
-      // Fallback to Gemini
-      if (this.geminiModel) {
-        try {
-          const result = await this.geminiModel.generateContent(prompt);
-          return result.response.text();
-        } catch (geminiError) {
-          console.error('Both AI services failed for contract analysis');
-        }
-      }
+      const completion = await this.groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.3,
+        max_tokens: 800
+      });
+      return completion.choices[0]?.message?.content || 'Analysis unavailable.';
+    } catch (error) {
+      console.error('Contract analysis error:', error.message);
+      throw new Error('Contract analysis temporarily unavailable.');
     }
-    
-    throw new Error('Contract analysis temporarily unavailable.');
   }
 }
 
