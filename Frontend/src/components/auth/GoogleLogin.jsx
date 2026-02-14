@@ -7,7 +7,8 @@ const GoogleLogin = ({ role = 'user', className = '', children }) => {
     setIsLoading(true);
     
     // Direct redirect to OAuth endpoint
-    window.location.href = `http://localhost:5001/api/oauth/google?role=${encodeURIComponent(role)}`;
+    const backendUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
+    window.location.href = `${backendUrl}/api/oauth/google?role=${encodeURIComponent(role)}`;
   };
 
   const defaultClassName = `

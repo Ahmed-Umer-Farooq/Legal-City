@@ -15,7 +15,8 @@ const useOAuth = () => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/oauth/me', {
+      const backendUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/api/oauth/me`, {
         credentials: 'include'
       });
       
@@ -66,7 +67,8 @@ const useOAuth = () => {
     
     try {
       // Direct redirect to OAuth endpoint
-      window.location.href = `http://localhost:5001/api/oauth/google?role=${encodeURIComponent(role)}`;
+      const backendUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
+      window.location.href = `${backendUrl}/api/oauth/google?role=${encodeURIComponent(role)}`;
     } catch (error) {
       console.error('OAuth initiation failed:', error);
       toast.error('Failed to initiate Google login. Please try again.');
@@ -76,7 +78,8 @@ const useOAuth = () => {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:5001/api/oauth/logout', {
+      const backendUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
+      await fetch(`${backendUrl}/api/oauth/logout`, {
         method: 'POST',
         credentials: 'include'
       });
