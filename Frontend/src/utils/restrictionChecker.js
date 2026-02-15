@@ -1,6 +1,16 @@
 // DEPLOYMENT MODE: ALL RESTRICTIONS BYPASSED
 export const checkFeatureAccess = (featureName, lawyer) => {
   console.log(`🚀 DEPLOYMENT MODE: Allowing access to ${featureName}`);
+  
+  // ALWAYS allow AI analyzer regardless of subscription
+  if (featureName === 'ai_analyzer') {
+    return { 
+      allowed: true,
+      reason: 'ai_unrestricted',
+      message: 'AI Analyzer is available to all users'
+    };
+  }
+  
   return { 
     allowed: true,
     reason: 'deployment_mode',
