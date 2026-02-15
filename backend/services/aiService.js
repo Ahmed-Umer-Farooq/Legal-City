@@ -34,15 +34,32 @@ class AIService {
     try {
       let text = '';
       
+      console.log(`📄 Processing ${fileType} file: ${filePath}`);
+      
       if (fileType === 'pdf') {
-        const dataBuffer = fs.readFileSync(filePath);
-        const data = await pdfParse(dataBuffer);
-        text = data.text;
+        try {
+          const dataBuffer = fs.readFileSync(filePath);
+          console.log(`   PDF size: ${dataBuffer.length} bytes`);
+          const data = await pdfParse(dataBuffer);
+          text = data.text;
+          console.log(`   Extracted ${text.length} characters from PDF`);
+          
+          if (!text || text.trim().length === 0) {
+            throw new Error('PDF appears to be empty or contains only images. Please use a text-based PDF.');
+          }
+        } catch (pdfError) {
+          console.error('PDF parsing error:', pdfError.message);
+          throw new Error(`Failed to read PDF: ${pdfError.message}. Try converting to TXT or DOCX format.`);
+        }
       } else if (fileType === 'docx') {
         const result = await mammoth.extractRawText({ path: filePath });
         text = result.value;
       } else if (fileType === 'txt') {
         text = fs.readFileSync(filePath, 'utf8');
+      }
+
+      if (!text || text.trim().length < 10) {
+        throw new Error('Document appears to be empty or too short to analyze.');
       }
 
       const prompt = `As a legal AI assistant, analyze this document and provide:
