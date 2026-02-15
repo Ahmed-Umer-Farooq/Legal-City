@@ -4,8 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const aiController = require('../controllers/aiController');
-const { authenticate, authorize } = require('../middleware/modernAuth');
-const { checkFeatureAccess } = require('../middleware/featureAccess');
+const { authenticate } = require('../middleware/modernAuth');
 
 // Configure multer for file uploads
 const uploadDir = 'uploads/ai-documents/';
@@ -39,17 +38,8 @@ const upload = multer({
   }
 });
 
-// Middleware to check if user is a lawyer - NO MEMBERSHIP RESTRICTIONS
-const requireLawyer = (req, res, next) => {
-  if (req.user && req.user.role === 'lawyer') {
-    console.log('✅ Lawyer access granted - no membership restrictions');
-    next();
-  } else {
-    res.status(403).json({ error: 'Access denied. Lawyer account required.' });
-  }
-};
-
-// Routes for all authenticated users - NO RESTRICTIONS
+// ✅ AI ROUTES - NO SUBSCRIPTION RESTRICTIONS
+// All authenticated users can access AI features
 router.post('/summarize-document', authenticate, upload.single('document'), aiController.summarizeDocument);
 router.post('/analyze-contract', authenticate, aiController.analyzeContract);
 router.post('/document-chat', authenticate, aiController.documentChat);
